@@ -1,3 +1,12 @@
+process.on('uncaughtException', (err) => {
+    if (err.code === 'ECONNRESET') {
+        console.warn('[Network] Handled an ECONNRESET drop. Safely reconnecting...');
+        return; 
+    }
+    console.error('Fatal Uncaught Exception:', err);
+    process.exit(1); 
+});
+
 "use strict";
 
 const { addLog, getLogs } = require("./logger");
