@@ -1251,7 +1251,7 @@ function createBot() {
     }, 150000); // 150s - Aternos servers can take 90-120s to finish spawning a player
 
     // FIX: guard against spawn firing twice (can happen on some servers)
-    let spawnHandled = false;
+        let spawnHandled = false;
 
     bot.once("spawn", () => {
       if (spawnHandled) return;
@@ -1264,28 +1264,29 @@ function createBot() {
       isReconnecting = false;
 
       addLog(
-        `[Bot] [+] Successfully spawned on server! (Version: ${bot.version})`,
+        `[Bot] [+] Successfully spawned on server! (Version: \${bot.version})`,
       );
 
-    // HEAP MITIGATION SCRIPTS
-    if (bot.physics) {
-         bot.physics.enabled = false; 
-    }
+      // HEAP MITIGATION SCRIPTS
+      if (bot.physics) {
+          bot.physics.enabled = false; 
+      }
 
-     bot.on('chunkColumnLoad', (point) => {
-        setTimeout(() => {
-            if (bot.world && typeof bot.world.unloadChunk === 'function') {
-                 bot.world.unloadChunk(point.x, point.z);
-             }
-       }, 3000); 
-    });
-        bot.on('entityGone', (entity) => {
-        if (bot.entities && bot.entities[entity.id]) {
-            delete bot.entities[entity.id];
-        }
-    });
+      bot.on('chunkColumnLoad', (point) => {
+          setTimeout(() => {
+              if (bot.world && typeof bot.world.unloadChunk === 'function') {
+                  bot.world.unloadChunk(point.x, point.z);
+              }
+          }, 3000); 
+      });
 
-              // DISCORD NOTIFICATION LOOP
+      bot.on('entityGone', (entity) => {
+          if (bot.entities && bot.entities[entity.id]) {
+              delete bot.entities[entity.id];
+          }
+      });
+
+      // DISCORD NOTIFICATION LOOP
       if (config.discord && config.discord.events && config.discord.events.connect) {
         sendDiscordWebhook(
           `[+] **Connected** to \`${config.server.ip}\``,
@@ -1293,7 +1294,6 @@ function createBot() {
         );
       }
 
-      // FIX: use bot.version (auto-detected) instead of config value so minecraft-data always matches
       const mcData = require("minecraft-data")(bot.version);
       const defaultMove = new Movements(bot, mcData);
       defaultMove.allowFreeMotion = false;
@@ -1306,8 +1306,12 @@ function createBot() {
       // Attempt creative mode (only works if bot has OP and enabled in settings)
       setTimeout(() => {
         if (bot && botState.connected && config.server["try-creative"]) {
-          bot.chat("/gamemode creative");
-          addLog("[INFO] Attempted to set creative mode (requires OP)");
+          try {
+            bot.chat("/gamemode creative");
+            addLog("[INFO] Attempted to set creative mode (requires OP)");
+          } catch (err) {
+            addLog(`[INFO] Creative mode error: ${err.message}`);
+          }
         }
       }, 3000);
 
@@ -1321,9 +1325,6 @@ function createBot() {
       });
     });
 
-    // FIX: 'kicked' fires before 'end'. Remove the scheduleReconnect from 'kicked'
-    // so that 'end' is the single source of reconnect truth, preventing double-trigger.
-    bot.on("kicked", (reason) => {
       // FIX: stringify reason if it's an object to make it readable in logs
       const kickReason =
         typeof reason === "object" ? JSON.stringify(reason) : reason;
