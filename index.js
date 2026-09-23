@@ -1360,8 +1360,20 @@ function createBot() {
         );
       }
 
-      // ALWAYS reconnect — bot must never leave the server
-      scheduleReconnect();
+      // ALWAYS reconnect — bot must never leave the server   
+        if (bot) {
+     try {
+       bot.removeAllListeners();
+       bot.end();
+     } catch (e) {
+       /* ignore */
+     }
+     bot = null;
+        }
+  scheduleReconnect();
+ });
+ 
+        scheduleReconnect();
     });
 
     bot.on("error", (err) => {
