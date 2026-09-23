@@ -1285,14 +1285,8 @@ function createBot() {
         }
     });
 
-   if (
-       config.discord &&
-
-        if (
-        config.discord &&
-        config.discord.events &&
-        config.discord.events.connect
-      ) {
+              // DISCORD NOTIFICATION LOOP
+      if (config.discord && config.discord.events && config.discord.events.connect) {
         sendDiscordWebhook(
           `[+] **Connected** to \`${config.server.ip}\``,
           0x4ade80,
