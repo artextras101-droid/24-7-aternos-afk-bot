@@ -2120,3 +2120,14 @@ addLog(
 addLog("=".repeat(50));
 
 createBot();
+addLog("=".repeat(50));
+
+      createBot();
+
+      // Global memory heap cleaner loop
+    setInterval(() => {
+        if (global.gc) {
+              global.gc();
+             addLog('[Memory] SoloCloudHosting garbage collector successfully cleared the heap.');
+           }
+       }, 5 * 60 * 1000);
