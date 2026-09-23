@@ -1266,7 +1266,29 @@ function createBot() {
       addLog(
         `[Bot] [+] Successfully spawned on server! (Version: ${bot.version})`,
       );
-      if (
+
+    // HEAP MITIGATION SCRIPTS
+    if (bot.physics) {
+         bot.physics.enabled = false; 
+    }
+
+     bot.on('chunkColumnLoad', (point) => {
+        setTimeout(() => {
+            if (bot.world && typeof bot.world.unloadChunk === 'function') {
+                 bot.world.unloadChunk(point.x, point.z);
+             }
+       }, 3000); 
+    });
+        bot.on('entityGone', (entity) => {
+        if (bot.entities && bot.entities[entity.id]) {
+            delete bot.entities[entity.id];
+        }
+    });
+
+   if (
+       config.discord &&
+
+        if (
         config.discord &&
         config.discord.events &&
         config.discord.events.connect
